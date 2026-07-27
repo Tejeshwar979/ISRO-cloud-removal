@@ -1,0 +1,1 @@
+# optimizer , training , loss fnx 
