@@ -37,8 +37,40 @@ def create_mask(cloud, target):
 
 
 class Data_preprocessing : 
-    def __init__(self , root_dir_path ):
-        self.root_dir_path = root_dir_path  
-        pass  
+    def __init__(self , sar , cloud , target ):
+        self.sar = sar
+        self.cloud = cloud 
+        self.target = target  
+        self.transformations = transforms.Compose([
+            transforms.CenterCrop(512) , 
+            transforms.ToTensor() , 
+            transforms.Normalize((0.5 , 0.5 , 0.5) , (0.5 , 0.5 , 0.5))
+        ])  
+        self.sar_dataset = [os.path.join(sar , img) for img in os.listdir(self.sar)]
+        self.cloud_dataset = [os.path.join(cloud , img) for img in os.listdir(self.cloud)]
+        self.target_dataset = [os.path.join(target , img) for img in os.listdir(self.target)]
+
+    def __getitem__(self, idx):
+        sar_path = self.sar_dataset[idx] 
+        cloud_path = self.cloud_dataset[idx]
+        target_path = self.target_dataset[idx] 
+
+        sar_img = Image.open(sar_path).convert("RGB")
+        cloud_img = Image.open(cloud_path).convert("RGB")
+        target_img = Image.open(target_path).convert("RGB") 
+        mask_img = create_mask(cloud_img , target_img)
+        
+        sar_img = self.transformations(sar_img)
+        cloud_img = self.transformations(cloud_img)
+        target_img = self.transformations(target_img) 
+
+        return sar_img , cloud_img , target_img , mask_img
+
+
+
+
+
+
+        
 
 
