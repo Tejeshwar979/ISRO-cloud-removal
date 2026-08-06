@@ -1,14 +1,13 @@
 # optimizer , training , loss fnx 
-
 from utils.model import *  
 from utils.loader import * 
 from utils.CARLloss import *  
 
 import argparse 
-
 parser = argparse.ArgumentParser() 
 
 parser.add_argument("--epochs" , type = int , default = 10) 
+parser.add_argument("--exp" , type = int , default = 1) 
 
 args = parser.parse_args()
 
@@ -24,7 +23,6 @@ DataLoader = None
 
 CARLloss = CARLLoss()
 
-
 for epoch in range(args.epochs) : 
     for sar , cloud , target , cloudmask in DataLoader :
 
@@ -35,8 +33,8 @@ for epoch in range(args.epochs) :
         pix_loss.backward()
         c_optim.step()
 
-    print(f" {epoch +1 }/ {args.epochs} loss = {pix_loss} ")
+    print(f" {epoch + 1}/ {args.epochs} loss = {pix_loss} ")
 
-torch.save(model.state_dict() , "saved_model_1.pth")
+torch.save(model.state_dict() , f"saved_model_{args.exp}.pth")
 
 

@@ -17,7 +17,7 @@ class f0(nn.Module) :
         x = torch.cat([x1 , x2] , dim = 1)
         return self.init_features(x)
 
-# ResBlock  
+# Res Block
 
 class Resblock(nn.Module) : 
     def __init__(self, res_scale = 0.1):
