@@ -14,7 +14,7 @@ import argparse
 parser = argparse.ArgumentParser() 
 
 parser.add_argument("--epochs" , type = int , default = 10) 
-parser.add_argument("--exp" , type = int , default = 1) \
+parser.add_argument("--exp" , type = int , default = 1) 
 
 parser.add_argument("--sar" , type = str , default = "") 
 parser.add_argument("--cloud" , type = str , default = "")
