@@ -1,8 +1,6 @@
 # create resnet architecture  
-
 import torch 
 import torch.nn as nn  
-
 from PIL import Image  
 
 # init_conv layer 
