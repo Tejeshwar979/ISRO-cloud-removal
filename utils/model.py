@@ -1,29 +1,31 @@
 # create resnet architecture  
+
 import torch 
 import torch.nn as nn  
 from PIL import Image  
 
-# init_conv layer 
+# init_conv layer    
 
 class f0(nn.Module) : 
     def __init__(self):
+        super().__init__()
         self.init_features = nn.Sequential(
             nn.Conv2d(15 , 64 , 3 , 1 , 1),
             nn.ReLU(),
         )
-    def forward(self , x1 , x2):
+    def forward(self, x1 , x2):
         x = torch.cat([x1 , x2] , dim = 1)
         return self.init_features(x)
 
-# Res Block
+# Res Block  
 
 class Resblock(nn.Module) : 
     def __init__(self, res_scale = 0.1):
         super().__init__()
         self.Reslayer = nn.Sequential(
-            nn.Conv2d(64 , 128 , 3 , 1, 1),
+            nn.Conv2d(64 , 64 , 3 , 1, 1),
             nn.ReLU(),
-            nn.Conv2d(128 , 256 , 3 , 1 , 1) ,
+            nn.Conv2d(64 , 64 , 3 , 1 , 1) ,
             nn.ReLU(),
         )
         self.scale = res_scale
@@ -31,7 +33,6 @@ class Resblock(nn.Module) :
         out = self.Reslayer(x)
         scaled_out = out * self.scale   
         return x + scaled_out 
-
 
 class ResLayers(nn.Module) : 
     def __init__(self):
@@ -46,12 +47,15 @@ class ResLayers(nn.Module) :
 class Model(nn.Module) : 
     def __init__(self):
         super().__init__()
+        self.f0 = f0()
+        self.ResLayers = ResLayers()
         self.final_conv = nn.Sequential(
-            nn.Conv2d(256 , 256 , 3 , 1, 1)
+            nn.Conv2d(64 , 13 , 3 , 1, 1)
         )
+
     def forward(self , x1 , x2):
-        out = f0(x1 , x2)
-        out = ResLayers(out)
+        out = self.f0(x1 , x2)
+        out = self.ResLayers(out)
         return x2 +  self.final_conv(out)
 
 

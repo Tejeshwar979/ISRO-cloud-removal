@@ -1,7 +1,6 @@
-# create a loader for images 
+# create a loader for images   
 
-from PIL import Image 
-
+import rasterio
 import torch 
 import torch.nn as nn  
 import numpy as np
@@ -12,7 +11,10 @@ from torchvision import transforms
 
 import os 
 
+device = torch.device("cuda")
+
 def create_mask(cloud, target):
+
     diff = torch.abs(target - cloud)
 
     diff = diff.mean(dim=0)
@@ -49,28 +51,53 @@ class Data_preprocessing :
         self.sar_dataset = [os.path.join(sar , img) for img in os.listdir(self.sar)]
         self.cloud_dataset = [os.path.join(cloud , img) for img in os.listdir(self.cloud)]
         self.target_dataset = [os.path.join(target , img) for img in os.listdir(self.target)]
+    
+    def __len__(self):
+        sar_len = len(self.sar_dataset)
+        cloud_len = len(self.cloud_dataset)
+        target_len = len(self.target_dataset)
+        return min(
+            sar_len , 
+            cloud_len , 
+            target_len
+        )
 
     def __getitem__(self, idx):
-        sar_path = self.sar_dataset[idx] 
+
+        sar_path = self.sar_dataset[idx]
         cloud_path = self.cloud_dataset[idx]
-        target_path = self.target_dataset[idx] 
-
-        sar_img = Image.open(sar_path).convert("RGB")
-        cloud_img = Image.open(cloud_path).convert("RGB")
-        target_img = Image.open(target_path).convert("RGB") 
-        mask_img = create_mask(cloud_img , target_img)
-        
-        sar_img = self.transformations(sar_img)
-        cloud_img = self.transformations(cloud_img)
-        target_img = self.transformations(target_img) 
-
-        return sar_img , cloud_img , target_img , mask_img
+        target_path = self.target_dataset[idx]
 
 
+        with rasterio.open(sar_path) as src:
+            sar_img = src.read()
 
 
+        with rasterio.open(cloud_path) as src:
+            cloud_img = src.read()
 
 
-        
+        with rasterio.open(target_path) as src:
+            target_img = src.read()
+
+
+        sar_img = torch.from_numpy(
+            sar_img.astype(np.float32)
+        )
+
+        cloud_img = torch.from_numpy(
+            cloud_img.astype(np.float32)
+        )
+
+        target_img = torch.from_numpy(
+            target_img.astype(np.float32)
+        )
+
+        mask_img = create_mask(
+            cloud_img,
+            target_img
+        )
+
+        return sar_img, cloud_img, target_img, mask_img
 
 
