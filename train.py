@@ -1,4 +1,4 @@
-# optimizer , training , loss fnx 
+# optimizer , training , loss fnx  
 
 import torch 
 import torch.nn as nn 

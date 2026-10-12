@@ -44,6 +44,7 @@ class ResLayers(nn.Module) :
         return self.layers_Res(x)
 
 
+
 class Model(nn.Module) : 
     def __init__(self):
         super().__init__()
